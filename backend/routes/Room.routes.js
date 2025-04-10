@@ -20,6 +20,18 @@ roomRouter.get("/:id", (req, res) => {
   res.status(200).json({ message: `Room details for ID: ${id}` });
 });
 
+roomRouter.get("/:id/users", (req, res) => {
+  // Logic to get all users in a room by room ID
+  const { id } = req.params;
+  res.status(200).json({ message: `List of users in room ID: ${id}` });
+});
+
+roomRouter.get("/:id/messages", (req, res) => {
+  // Logic to get all messages in a room by room ID
+  const { id } = req.params;
+  res.status(200).json({ message: `List of messages in room ID: ${id}` });
+});
+
 // DELETE Routes
 roomRouter.delete("/:id", (req, res) => {
   // Logic to delete a room by ID

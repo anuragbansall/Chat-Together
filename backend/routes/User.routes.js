@@ -2,13 +2,6 @@ import express from "express";
 
 const userRouter = express.Router();
 
-// GET Routes
-userRouter.get("/:roomId", (req, res) => {
-  // Logic to get all users in a room
-  const { roomId } = req.params;
-  res.status(200).json({ message: `List of all users in room ID: ${roomId}` });
-});
-
 // POST Routes
 userRouter.post("/", (req, res) => {
   //   Logic to join a user to a room
