@@ -16,6 +16,18 @@ app.use("/api/messages", messageRouter);
 app.use("/api/rooms", roomRouter);
 app.use("/api/users", userRouter);
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(statusCode).json({
+    status: "error",
+    message,
+  });
+});
+
 app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
   await connectDB();
