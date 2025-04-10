@@ -1,14 +1,9 @@
 import express from "express";
+import { sendMessage } from "../controllers/Message.controller";
 
 const messageRouter = express.Router();
 
 // POST Routes
-messageRouter.post("/", (req, res) => {
-  // Logic to send a message in a room
-  const { roomId, message } = req.body;
-  res
-    .status(201)
-    .json({ message: `Message sent to room ID: ${roomId}`, content: message });
-});
+messageRouter.post("/", sendMessage);
 
 export default messageRouter;
