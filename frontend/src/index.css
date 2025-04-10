@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+.form-group {
+  @apply flex flex-col gap-2 w-full;
+}
+
+.form-group label {
+  @apply text-sm font-medium text-gray-700;
+}
+
+.form-group input {
+  @apply border border-[#EDE9FE] rounded-md p-2 w-full;
+}
+
+.form-group input:focus {
+  @apply border-[#A855F7] outline-none;
+}
+
+.primary-button {
+  @apply bg-[#A855F7] text-white font-semibold py-2 px-4 rounded-md text-center cursor-pointer flex items-center justify-center gap-2;
+}
