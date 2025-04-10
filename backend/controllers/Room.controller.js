@@ -8,7 +8,7 @@ export const createRoom = async (req, res, next) => {
     const { roomName, roomDescription } = req.body;
     const roomId = uuidv4();
 
-    const existing = await Room.fiind({ roomName });
+    const existing = await Room.findOne({ roomName });
     if (existing) {
       const error = new Error("Room already exists");
       error.status = 400;
@@ -106,7 +106,7 @@ export const getRoomMessages = async (req, res, next) => {
     const { id } = req.params;
     const room = await Room.findById(id).populate({
       path: "messages",
-      populate: { path: "user" },
+      populate: { path: "sender" },
     });
 
     if (!room) {
