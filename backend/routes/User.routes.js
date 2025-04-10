@@ -1,15 +1,17 @@
 import express from "express";
-import { joinRoom, leaveRoom } from "../controllers/User.controller";
+import {
+  getUsersInRoom,
+  joinRoom,
+  leaveRoom,
+} from "../controllers/User.controller.js";
 
 const userRouter = express.Router();
 
 // GET Routes
-userRouter.get("/:roomId", );
-
+userRouter.get("/:roomId", getUsersInRoom);
 
 // POST Routes
 userRouter.post("/", joinRoom);
-
 
 // DELETE Routes
 userRouter.delete("/:roomId/:username", leaveRoom);
