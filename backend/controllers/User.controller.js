@@ -41,6 +41,12 @@ export const joinRoom = async (req, res, next) => {
       roomId,
     });
 
+    const room = await Room.findByIdAndUpdate(
+      roomId,
+      { $push: { users: user._id } },
+      { new: true }
+    );
+
     res.status(201).json({
       status: "success",
       message: "User joined room",
