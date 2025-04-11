@@ -68,9 +68,10 @@ function ChatRoom({
           `http://localhost:3000/api/rooms/${roomId}`
         );
         const data = await response.json();
+        console.log("lalalal", data.data?.room.users);
         if (response.ok) {
           console.log("Room data:", data);
-          setRoomUsers(data.data?.room.roomUsers || []);
+          setRoomUsers(data.data?.room.users || []);
           setMessages(data.data?.room.messages || []);
           setRoomName(data.data?.room.roomName || "");
         } else {
