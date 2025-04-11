@@ -148,3 +148,44 @@ export const deleteRoom = async (req, res, next) => {
     next(error);
   }
 };
+
+export const leaveRoom = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.body;
+
+    const room = await Room.findById(id);
+    if (!room) {
+      const error = new Error("Room not found");
+      error.status = 404;
+      return next(error);
+    }
+
+    room.users = room.users.filter((user) => user.toString() !== userId);
+    await room.save();
+
+    // Update User rooms
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { rooms: id } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      const error = new Error("User not found");
+      error.status = 404;
+      return next(error);
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "User left the room successfully",
+      data: {
+        room,
+        user: updatedUser,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

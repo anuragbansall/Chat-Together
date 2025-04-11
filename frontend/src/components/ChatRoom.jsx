@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import { ImExit } from "react-icons/im";
 import { IoIosSend } from "react-icons/io";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 
 function ChatRoom({
   messages,
@@ -14,23 +15,53 @@ function ChatRoom({
   setRoomUsers,
 }) {
   const [message, setMessage] = React.useState("");
+  const { roomId } = useParams();
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
-    console.log("Sending message:", message);
+    const response = await axios.post(`http://localhost:3000/api/messages`, {
+      roomId,
+      text: message,
+      senderId: user?._id,
+    });
+
+    if (response.status === 201) {
+      console.log("Message sent:", response.data);
+      setMessages((prev) => [...prev, response.data.data]);
+    }
+
     setMessage("");
   };
 
-  const handleLeaveRoom = () => {
-    console.log("Leaving room");
-    // Logic to leave the room
+  const handleLeaveRoom = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/rooms/${roomId}/leave`,
+        {
+          userId: user?._id,
+        }
+      );
+      if (response.status === 200) {
+        console.log("Left room successfully:", response.data);
+        setUser(null);
+        navigate("/");
+      } else {
+        console.error("Failed to leave room:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error leaving room:", error);
+    }
   };
 
-  const { roomId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+
     const fetchRoomData = async () => {
       try {
         const response = await fetch(
@@ -96,8 +127,8 @@ function ChatRoom({
           {messages.length > 0 ? (
             messages.map((message, index) => (
               <div key={index} className="mb-2">
-                <p className="font-semibold">{message.user}</p>
-                <p>{message.text}</p>
+                <p className="font-semibold">{message?.user}</p>
+                <p>{message?.text}</p>
               </div>
             ))
           ) : (

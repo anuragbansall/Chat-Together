@@ -5,11 +5,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  roomId: {
-    type: String,
-    required: true,
-    unique: true,
-  },
   rooms: [
     {
       type: mongoose.Schema.Types.ObjectId,

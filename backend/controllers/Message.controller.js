@@ -27,7 +27,11 @@ export const sendMessage = async (req, res, next) => {
     room.messages.push(newMessage._id);
     await room.save();
 
-    res.status(201).json(newMessage);
+    res.status(201).json({
+      status: "success",
+      message: "Message sent successfully",
+      data: newMessage,
+    });
   } catch (error) {
     next(error);
   }
