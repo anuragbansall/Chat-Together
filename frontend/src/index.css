@@ -19,3 +19,7 @@
 .primary-button {
   @apply bg-[#A855F7] text-white font-semibold py-2 px-4 rounded-md text-center cursor-pointer flex items-center justify-center gap-2;
 }
+
+.danger-button {
+  @apply p-2 border-1 border-red-300 text-red-600 flex items-center justify-center gap-2 rounded-md hover:bg-red-100 transition duration-200 ease-in-out cursor-pointer;
+}

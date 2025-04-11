@@ -18,7 +18,7 @@ function JoinRoom() {
   };
 
   return (
-    <div className="bg-white p-8 shadow-md rounded-lg flex flex-col items-center justify-center gap-y-2">
+    <div className="bg-white p-8 shadow-md rounded-lg flex flex-col items-center justify-center gap-y-2 max-w-full w-full md:w-fit h-screen md:h-fit">
       <span className="bg-[#EDE9FE] p-4 rounded-full">
         <LuBotMessageSquare size={40} className="text-[#A855F7]" />
       </span>
@@ -28,7 +28,10 @@ function JoinRoom() {
         Enter your details to join a chat room
       </p>
 
-      <form className="flex flex-col gap-y-4 w-sm mt-4" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col gap-y-4 w-sm mt-4 max-w-full"
+        onSubmit={handleSubmit}
+      >
         <div className="form-group">
           <label htmlFor="username">Your Name</label>
           <input
@@ -43,12 +46,12 @@ function JoinRoom() {
         </div>
 
         <div className="form-group">
-          <label htmlFor="room">Room ID</label>
+          <label htmlFor="room">Room Name</label>
           <input
             type="text"
             id="room"
             name="room"
-            placeholder="Enter room ID"
+            placeholder="Enter room name"
             required
             value={room}
             onChange={(e) => setRoom(e.target.value)}
