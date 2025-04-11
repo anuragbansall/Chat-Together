@@ -1,5 +1,6 @@
 import User from "../models/User.model.js";
 import Room from "../models/Room.model.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const getUsersInRoom = async (req, res, next) => {
   try {
@@ -27,32 +28,36 @@ export const getUsersInRoom = async (req, res, next) => {
 
 export const joinRoom = async (req, res, next) => {
   try {
-    const { roomId, username } = req.body;
+    let { roomId, username } = req.body;
 
-    const roomExists = await Room.findById(roomId);
-    if (!roomExists) {
-      const error = new Error("Room not found");
-      error.statusCode = 404;
-      throw error;
+    if (!roomId || !username) {
+      return res.status(400).json({
+        status: "fail",
+        message: "roomId and username are required",
+      });
     }
 
-    const user = await User.create({
-      username,
-      roomId,
+    // Check if room exists
+    let room = await Room.findById(roomId);
+
+    if (!room) {
+      // If room doesn't exist
+      const newRoom = await Room.create({ roomId: uuidv4(), users: [] });
+      room = newRoom;
+    }
+
+    const user = await User.create({ username, roomId: room._id });
+
+    await Room.findByIdAndUpdate(room._id, {
+      $push: { users: user._id },
     });
 
-    const room = await Room.findByIdAndUpdate(
-      roomId,
-      { $push: { users: user._id } },
-      { new: true }
-    );
-
-    res.status(201).json({
+    return res.status(200).json({
       status: "success",
-      message: "User joined room",
+      message: "Joined room successfully",
       data: {
+        roomId: room._id,
         user,
-        roomId,
       },
     });
   } catch (error) {
