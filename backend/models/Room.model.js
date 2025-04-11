@@ -15,7 +15,7 @@ const roomSchema = new mongoose.Schema(
     },
     roomDescription: {
       type: String,
-      required: true,
+      default: "",
     },
     users: [
       {

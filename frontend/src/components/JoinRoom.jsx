@@ -1,20 +1,43 @@
 import React from "react";
+import axios from "axios";
 import { LuBotMessageSquare } from "react-icons/lu";
 import { BsPeople } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 function JoinRoom() {
   const [username, setUsername] = React.useState("");
   const [room, setRoom] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = {
-      username: username,
-      room: room,
-    };
+    try {
+      setIsLoading(true);
+      const response = await axios.post("http://localhost:3000/api/users", {
+        username,
+        roomName: room,
+      });
 
-    console.log("Form submitted:", formData);
+      const { roomId } = response.data.data;
+
+      setIsLoading(false);
+
+      if (!roomId) {
+        alert("Room not found or invalid room ID");
+        return;
+      }
+
+      navigate(`/chat/${roomId}`, {
+        state: { username, roomId },
+      });
+    } catch (err) {
+      console.error("Error joining room:", err);
+      alert("Failed to join room");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,7 +82,7 @@ function JoinRoom() {
         </div>
         <button className="primary-button">
           <BsPeople size={20} />
-          Join Room
+          {isLoading ? "Joining..." : "Join Room"}
         </button>
       </form>
     </div>
