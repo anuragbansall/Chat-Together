@@ -8,14 +8,16 @@ export const createRoom = async (req, res, next) => {
   try {
     const { roomName, username } = req.body;
     if (!roomName || !username) {
-      return res
-        .status(400)
-        .json({ message: "Room name and username are required" });
+      const error = new Error("Room name and username are required");
+      error.status = 400;
+      return next(error);
     }
 
     const existing = await Room.findOne({ roomName });
     if (existing) {
-      return res.status(400).json({ message: "Room already exists" });
+      const error = new Error("Room name already exists");
+      error.status = 400;
+      return next(error);
     }
 
     const roomId = uuidv4();
@@ -23,7 +25,6 @@ export const createRoom = async (req, res, next) => {
       roomId,
       roomName,
     });
-    await newRoom.save();
 
     const userId = uuidv4();
     const newUser = new User({
@@ -32,6 +33,10 @@ export const createRoom = async (req, res, next) => {
       roomId,
     });
     await newUser.save();
+
+    newRoom.users.push(newUser._id);
+
+    await newRoom.save();
 
     res.status(201).json({
       status: "success",
