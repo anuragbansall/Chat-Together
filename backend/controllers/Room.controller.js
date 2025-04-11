@@ -32,10 +32,11 @@ export const createRoom = async (req, res, next) => {
       username,
       roomId,
     });
-    await newUser.save();
 
     newRoom.users.push(newUser._id);
+    newUser.rooms.push(newRoom._id);
 
+    await newUser.save();
     await newRoom.save();
 
     res.status(201).json({
