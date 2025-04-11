@@ -1,8 +1,9 @@
 import React from "react";
 import axios from "axios";
-import { LuBotMessageSquare } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 import { BsPeople } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { LuBotMessageSquare } from "react-icons/lu";
+import { Form } from "./Form";
 
 function JoinRoom({ setUser }) {
   const [username, setUsername] = React.useState("");
@@ -22,7 +23,6 @@ function JoinRoom({ setUser }) {
 
       const { roomId } = response.data.data;
       setUser(response.data.data.user);
-      setIsLoading(false);
 
       if (!roomId) {
         alert("Room not found or invalid room ID");
@@ -41,56 +41,44 @@ function JoinRoom({ setUser }) {
   };
 
   return (
-    <div className="bg-white p-8 shadow-md rounded-lg flex flex-col items-center justify-center gap-y-2 max-w-full w-full md:w-fit h-screen md:h-fit">
-      <span className="bg-[#EDE9FE] p-4 rounded-full">
-        <LuBotMessageSquare size={40} className="text-[#A855F7]" />
-      </span>
+    <Form.Wrapper>
+      <Form.Header
+        icon={<LuBotMessageSquare size={40} className="text-[#A855F7]" />}
+        title="Chat Together"
+        description="Enter your details to join a chat room"
+      />
 
-      <h1 className="text-2xl font-bold text-[#A855F7]">Chat Together</h1>
-      <p className="text-zinc-500 text-center">
-        Enter your details to join a chat room
-      </p>
+      <Form.Root onSubmit={handleSubmit}>
+        <Form.Group
+          label="Your Name"
+          id="username"
+          type="text"
+          name="username"
+          placeholder="Enter your name"
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <Form.Group
+          label="Room ID"
+          id="room"
+          type="text"
+          name="room"
+          placeholder="Enter room ID"
+          required
+          value={room}
+          onChange={(e) => setRoom(e.target.value)}
+        />
 
-      <form
-        className="flex flex-col gap-y-4 w-sm mt-4 max-w-full"
-        onSubmit={handleSubmit}
-      >
-        <div className="form-group">
-          <label htmlFor="username">Your Name</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Enter your name"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
+        <Form.Link to="/create" text="Create a new room" />
 
-        <div className="form-group">
-          <label htmlFor="room">Room ID</label>
-          <input
-            type="text"
-            id="room"
-            name="room"
-            placeholder="Enter room ID"
-            required
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
-          />
-        </div>
-
-        <Link to="/create" className="text-[#A855F7] hover:underline">
-          Create a new room
-        </Link>
-
-        <button className="primary-button">
-          <BsPeople size={20} />
-          {isLoading ? "Joining..." : "Join Room"}
-        </button>
-      </form>
-    </div>
+        <Form.Button
+          icon={<BsPeople size={20} />}
+          text="Join Room"
+          isLoading={isLoading}
+        />
+      </Form.Root>
+    </Form.Wrapper>
   );
 }
 
