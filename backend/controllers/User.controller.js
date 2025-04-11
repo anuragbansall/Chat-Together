@@ -28,7 +28,7 @@ export const getUsersInRoom = async (req, res, next) => {
 
 export const joinRoom = async (req, res, next) => {
   try {
-    let { roomName, username } = req.body;
+    const { roomName, username } = req.body;
 
     if (!roomName || !username) {
       return res.status(400).json({
@@ -37,27 +37,37 @@ export const joinRoom = async (req, res, next) => {
       });
     }
 
-    // Check if room exists by name
+    // Check if room already exists
     let room = await Room.findOne({ roomName });
 
+    // If room doesn't exist, create it
     if (!room) {
-      // If room doesn't exist, create it with a unique ID and the provided name
-      room = await Room.create({ roomId: uuidv4(), roomName, users: [] });
+      room = await Room.create({
+        roomId: uuidv4(),
+        roomName,
+        users: [],
+      });
     }
 
-    // Create user and assign to room
-    const user = await User.create({ username, roomId: room._id });
-
-    // Add user to room's user list
-    await Room.findByIdAndUpdate(room._id, {
-      $push: { users: user._id },
+    // Create new user with the room's ID
+    const user = await User.create({
+      username,
+      roomId: room._id,
     });
+
+    // Add user to the room if not already added
+    if (!room.users.includes(user._id)) {
+      await Room.findByIdAndUpdate(room._id, {
+        $push: { users: user._id },
+      });
+    }
 
     return res.status(200).json({
       status: "success",
       message: "Joined room successfully",
       data: {
         roomId: room._id,
+        roomName: room.roomName,
         user,
       },
     });

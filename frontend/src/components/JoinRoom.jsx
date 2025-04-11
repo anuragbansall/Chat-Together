@@ -4,7 +4,7 @@ import { LuBotMessageSquare } from "react-icons/lu";
 import { BsPeople } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
-function JoinRoom() {
+function JoinRoom({ setUser }) {
   const [username, setUsername] = React.useState("");
   const [room, setRoom] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -21,7 +21,7 @@ function JoinRoom() {
       });
 
       const { roomId } = response.data.data;
-
+      setUser(response.data.data.user);
       setIsLoading(false);
 
       if (!roomId) {

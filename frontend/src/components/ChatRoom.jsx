@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ImExit } from "react-icons/im";
 import { IoIosSend } from "react-icons/io";
+import { useParams } from "react-router-dom";
 
-function ChatRoom() {
-  const [messages, setMessages] = React.useState([]);
-  const [users, setUsers] = React.useState([]);
+function ChatRoom({
+  messages,
+  setMessages,
+  user,
+  setUser,
+  roomName,
+  setRoomName,
+  roomUsers,
+  setRoomUsers,
+}) {
   const [message, setMessage] = React.useState("");
-  const [user, setUser] = React.useState("");
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -21,15 +28,43 @@ function ChatRoom() {
     // Logic to leave the room
   };
 
+  const { roomId } = useParams();
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/rooms/${roomId}`
+        );
+        const data = await response.json();
+        if (response.ok) {
+          console.log("Room data:", data);
+          setRoomUsers(data.data?.room.roomUsers || []);
+          setMessages(data.data?.room.messages || []);
+          setRoomName(data.data?.room.roomName || "");
+        } else {
+          console.error("Failed to fetch room data:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchRoomData();
+  }, [roomId]);
+
   return (
     <div className="h-scren w-full grow-1 flex bg-white">
       {/* Sidebar */}
       <aside className="w-1/5 hidden xl:flex flex-col p-4 border-r-1 border-gray-300 shrink-0">
         <h2 className="text-xl font-semibold mb-4">
-          Room: <span className="">anuragsroom</span>
+          Room:{" "}
+          <span className="">
+            {roomName.length > 0 ? roomName : "Loading..."}
+          </span>
         </h2>
         <p className="bg-[#EDE9FE] text-[#A855F7] w-fit px-2 py-1 rounded-full font-semibold">
-          <span>{users.length > 0 ? users.length : 0}</span> user online
+          <span>{roomUsers.length > 0 ? roomUsers.length : 0}</span> user online
         </p>
 
         <button
@@ -45,7 +80,10 @@ function ChatRoom() {
       <main className="w-full grow-1 flex flex-col">
         <header className="w-full p-4 border-b-1 border-gray-300 flex items-center justify-between shrink-0">
           <h2 className="text-xl font-semibold">
-            Chat Room: <span className="">anuragsroom</span>
+            Chat Room:{" "}
+            <span className="">
+              {roomName.length > 0 ? roomName : "Loading..."}
+            </span>
           </h2>
           <button className="danger-button" onClick={handleLeaveRoom}>
             <ImExit size={20} />
