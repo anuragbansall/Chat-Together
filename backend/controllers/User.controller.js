@@ -28,47 +28,42 @@ export const getUsersInRoom = async (req, res, next) => {
 
 export const joinRoom = async (req, res, next) => {
   try {
-    const { roomName, username } = req.body;
+    const { roomId, username } = req.body;
 
-    if (!roomName || !username) {
+    if (!roomId || !username) {
       return res.status(400).json({
         status: "fail",
-        message: "roomName and username are required",
+        message: "roomId and username are required",
       });
     }
 
-    // Check if room already exists
-    let room = await Room.findOne({ roomName });
+    // Check if room exists
+    let room = await Room.findOne({ roomId });
+    console.log("Room found:", room);
 
-    // If room doesn't exist, create it
     if (!room) {
-      room = await Room.create({
-        roomId: uuidv4(),
-        roomName,
-        users: [],
-      });
+      const error = new Error("Room not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    // Create new user with the room's ID
-    const user = await User.create({
+    // Create a new user in the room
+    const newUser = new User({
       username,
-      roomId: room._id,
     });
 
-    // Add user to the room if not already added
-    if (!room.users.includes(user._id)) {
-      await Room.findByIdAndUpdate(room._id, {
-        $push: { users: user._id },
-      });
-    }
+    newUser.rooms.push(room._id);
+    await newUser.save();
 
-    return res.status(200).json({
+    room.users.push(newUser._id);
+    await room.save();
+
+    res.status(200).json({
       status: "success",
-      message: "Joined room successfully",
+      message: "User joined room successfully",
       data: {
-        roomId: room._id,
-        roomName: room.roomName,
-        user,
+        user: newUser,
+        roomId: room.roomId,
       },
     });
   } catch (error) {

@@ -2,36 +2,50 @@ import Room from "../models/Room.model.js";
 import User from "../models/User.model.js";
 import Message from "../models/Message.model.js";
 import { v4 as uuidv4 } from "uuid";
+import mongoose from "mongoose";
 
 export const createRoom = async (req, res, next) => {
   try {
-    const { roomName, roomDescription } = req.body;
-    const roomId = uuidv4();
+    const { roomName, username } = req.body;
+    if (!roomName || !username) {
+      return res
+        .status(400)
+        .json({ message: "Room name and username are required" });
+    }
 
     const existing = await Room.findOne({ roomName });
     if (existing) {
-      const error = new Error("Room already exists");
-      error.status = 400;
-      return next(error);
+      return res.status(400).json({ message: "Room already exists" });
     }
 
+    const roomId = uuidv4();
     const newRoom = new Room({
       roomId,
       roomName,
-      roomDescription,
     });
-
     await newRoom.save();
+
+    const userId = uuidv4();
+    const newUser = new User({
+      userId,
+      username,
+      roomId,
+    });
+    await newUser.save();
 
     res.status(201).json({
       status: "success",
-      message: "Room created successfully",
+      message: "Room and user created successfully",
       data: {
-        newRoom,
+        roomId,
+        user: newUser,
       },
     });
   } catch (error) {
-    next(error);
+    console.error("Server Error:", error);
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -56,8 +70,10 @@ export const getAllRooms = async (req, res, next) => {
 
 export const getRoomById = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const room = await Room.findById(id).populate("users").populate("messages");
+    const { id: roomId } = req.params;
+    const room = await Room.findOne({ roomId })
+      .populate("users")
+      .populate("messages");
 
     if (!room) {
       const error = new Error("Room not found");
@@ -151,10 +167,10 @@ export const deleteRoom = async (req, res, next) => {
 
 export const leaveRoom = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { id: roomId } = req.params;
     const { userId } = req.body;
 
-    const room = await Room.findById(id);
+    const room = await Room.findOne({ roomId });
     if (!room) {
       const error = new Error("Room not found");
       error.status = 404;
@@ -167,10 +183,9 @@ export const leaveRoom = async (req, res, next) => {
     // Update User rooms
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { $pull: { rooms: id } },
+      { $pull: { rooms: room._id } },
       { new: true }
     );
-
     if (!updatedUser) {
       const error = new Error("User not found");
       error.status = 404;

@@ -2,7 +2,7 @@ import React from "react";
 import JoinRoom from "./components/JoinRoom";
 import ChatRoom from "./components/ChatRoom";
 import { Routes, Route } from "react-router-dom";
-import CreateRoom from "./components/createRoom";
+import CreateRoom from "./components/CreateRoom";
 
 function App() {
   const [user, setUser] = React.useState(null);
@@ -38,7 +38,7 @@ function App() {
             />
           }
         />
-        <Route path="*" element={<JoinRoom />} setUser={setUser} />
+        <Route path="*" element={<JoinRoom setUser={setUser} />} />
       </Routes>
     </div>
   );

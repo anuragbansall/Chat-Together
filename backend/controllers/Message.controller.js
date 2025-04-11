@@ -6,7 +6,7 @@ export const sendMessage = async (req, res, next) => {
   try {
     const { roomId, text, senderId } = req.body;
 
-    const room = await Room.findById(roomId);
+    const room = await Room.findOne({ roomId });
     if (!room) {
       return res.status(404).json({ message: "Room not found" });
     }

@@ -8,8 +8,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     roomId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Room",
+      type: String,
       required: true,
     },
     text: {

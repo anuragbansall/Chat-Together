@@ -17,7 +17,7 @@ function JoinRoom({ setUser }) {
       setIsLoading(true);
       const response = await axios.post("http://localhost:3000/api/users", {
         username,
-        roomName: room,
+        roomId: room,
       });
 
       const { roomId } = response.data.data;
